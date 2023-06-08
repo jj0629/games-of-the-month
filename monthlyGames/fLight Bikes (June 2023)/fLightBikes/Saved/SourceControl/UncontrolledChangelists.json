@@ -5,6 +5,11 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
+				"E:/justi/Documents/repos/games-of-the-month/monthlyGames/fLight Bikes (June 2023)/fLightBikes/Content/blankLevel.umap",
+				"E:/justi/Documents/repos/games-of-the-month/monthlyGames/fLight Bikes (June 2023)/fLightBikes/Content/Blueprints/BP_PlayerBase.uasset",
+				"E:/justi/Documents/repos/games-of-the-month/monthlyGames/fLight Bikes (June 2023)/fLightBikes/Content/Inputs/CameraLook.uasset",
+				"E:/justi/Documents/repos/games-of-the-month/monthlyGames/fLight Bikes (June 2023)/fLightBikes/Content/Inputs/BikeControls.uasset",
+				"E:/justi/Documents/repos/games-of-the-month/monthlyGames/fLight Bikes (June 2023)/fLightBikes/Content/Blueprints/BP_GamemodeBase.uasset",
 				"E:/justi/Documents/Unreal Projects/fLightBikes/Content/StarterContent/Architecture/Floor_400x400.uasset",
 				"E:/justi/Documents/Unreal Projects/fLightBikes/Content/testLevel_HLOD0_Instancing.uasset",
 				"E:/justi/Documents/Unreal Projects/fLightBikes/Content/blankLevel.umap",
