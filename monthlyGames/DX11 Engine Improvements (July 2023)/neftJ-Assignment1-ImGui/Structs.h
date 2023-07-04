@@ -14,6 +14,5 @@ struct FocusParams
 struct ChromaticAberrationParams
 {
 	DirectX::XMFLOAT2 direction;
-	DirectX::XMFLOAT2 offset;
 	float colorSplitDiff;
 };

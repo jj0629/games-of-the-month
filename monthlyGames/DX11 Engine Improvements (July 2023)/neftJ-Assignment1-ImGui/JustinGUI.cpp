@@ -133,8 +133,7 @@ void JustinGUI::CreateBaseTree(unsigned int width, unsigned int height)
 
 	if (ImGui::CollapsingHeader("Chromatic Aberration Parameters"))
 	{
-		ImGui::DragFloat2("Direction", &chromAbbParams->direction.x, 0.001f, 0, 1);
-		ImGui::DragFloat2("Offset", &chromAbbParams->offset.x, 0.001f, 0, 1);
+		ImGui::DragFloat2("Direction", &chromAbbParams->direction.x, 0.001f, -1, 1);
 		ImGui::DragFloat("Color Split Difference", &chromAbbParams->colorSplitDiff, 0.001f, 0, 1);
 	}
 

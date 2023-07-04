@@ -45,16 +45,15 @@ Renderer::Renderer(
 
 	// Set focus params
 	focusParams = std::make_shared<FocusParams>();
-	focusParams.get()->farFocus = 0.7f;
-	focusParams.get()->nearFocus = 0.1f;
+	focusParams.get()->farFocus = 0;
+	focusParams.get()->nearFocus = 0;
 	focusParams.get()->focusCenter = DirectX::XMFLOAT2(0, 0);
 	focusParams.get()->focusIntensity = 10;
 
 	// Set chromatic aberration params
 	chromAbbParams = std::make_shared<ChromaticAberrationParams>();
-	chromAbbParams.get()->direction = DirectX::XMFLOAT2(0.003f, 0.002f);
-	chromAbbParams.get()->offset = DirectX::XMFLOAT2(0.002, 0.007f);
-	chromAbbParams.get()->colorSplitDiff = 0.006f;
+	chromAbbParams.get()->direction = DirectX::XMFLOAT2(0, 0);
+	chromAbbParams.get()->colorSplitDiff = 0;
 
 	ResortEntityVectors();
 
@@ -325,7 +324,7 @@ void Renderer::Render(std::shared_ptr<Camera> camera, float deltaTime, float tot
 	
 	// Next, blur the two mrts
 	std::shared_ptr<SimplePixelShader> blurPS = pixelShaders->at("blurPS");
-	targets[0] = renderTargetRTVs[RenderTargetType::FINAL_COMPOSITE].Get();
+	targets[0] = renderTargetRTVs[RenderTargetType::BLUR_COMPOSITE].Get();
 	context->OMSetRenderTargets(1, targets, 0);
 	blurPS->SetShader();
 	blurPS->SetData("texWidth", &this->width, sizeof(unsigned int));
@@ -350,7 +349,6 @@ void Renderer::Render(std::shared_ptr<Camera> camera, float deltaTime, float tot
 	
 	// Set chromatic aberration params
 	chromAbbPS->SetFloat2("direction", chromAbbParams.get()->direction);
-	chromAbbPS->SetFloat2("offset", chromAbbParams.get()->offset);
 	chromAbbPS->SetFloat("colorSplitDiff", chromAbbParams.get()->colorSplitDiff);
 	chromAbbPS->CopyBufferData("chromAbbData");
 	chromAbbPS->SetShaderResourceView("sceneColors", renderTargetSRVs[RenderTargetType::BLUR_COMPOSITE]);
