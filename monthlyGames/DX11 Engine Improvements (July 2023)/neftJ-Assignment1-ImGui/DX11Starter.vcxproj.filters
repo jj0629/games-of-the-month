@@ -235,5 +235,8 @@
     <FxCompile Include="RefractionCompositePS.hlsl">
       <Filter>Shaders\MRT Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="ChromaticAberrationPS.hlsl">
+      <Filter>Shaders\MRT Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

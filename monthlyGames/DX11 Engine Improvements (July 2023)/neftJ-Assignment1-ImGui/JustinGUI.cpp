@@ -23,7 +23,7 @@ void JustinGUI::Update(float deltaTime, float totalTime, unsigned int width, uns
 	std::vector<Light> lights, int* lightCount,
 	std::vector<std::vector<std::shared_ptr<GameEntity>>> eGroups, std::vector<std::shared_ptr<Emitter>> emits,
 	std::vector<int*> renderTypeNums,
-	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> srvs, std::shared_ptr<FocusParams> fp,
+	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> srvs, std::shared_ptr<FocusParams> fp, std::shared_ptr<ChromaticAberrationParams> ca, 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> irradianceMapSRV)
 {
 	// Update internal references to the scene
@@ -34,6 +34,7 @@ void JustinGUI::Update(float deltaTime, float totalTime, unsigned int width, uns
 	this->renderTypeCounts = renderTypeNums;
 	this->renderTargetSRVs = srvs;
 	this->focusParams = fp;
+	this->chromAbbParams = ca;
 	this->irradianceMapSRV = irradianceMapSRV;
 	this->width = width;
 	this->height = height;
@@ -124,10 +125,17 @@ void JustinGUI::CreateBaseTree(unsigned int width, unsigned int height)
 
 	if (ImGui::CollapsingHeader("Depth of Field Parameters"))
 	{
-		ImGui::DragFloat("Near Focus", &focusParams->nearFocus, 0, 1);
-		ImGui::DragFloat("Far Focus", &focusParams->farFocus, 0, 1);
-		ImGui::DragFloat2("Focus Center", &focusParams->focusCenter.x);
-		ImGui::DragFloat("Focus Intensity", &focusParams->focusIntensity, 0, 100);
+		ImGui::DragFloat("Near Focus", &focusParams->nearFocus, 0.001f, 0, 1);
+		ImGui::DragFloat("Far Focus", &focusParams->farFocus, 0.001f, 0, 1);
+		ImGui::DragFloat2("Focus Center", &focusParams->focusCenter.x, 0.001f, 0, 1);
+		ImGui::DragFloat("Focus Intensity", &focusParams->focusIntensity, 0.1f, 0, 100);
+	}
+
+	if (ImGui::CollapsingHeader("Chromatic Aberration Parameters"))
+	{
+		ImGui::DragFloat2("Direction", &chromAbbParams->direction.x, 0.001f, 0, 1);
+		ImGui::DragFloat2("Offset", &chromAbbParams->offset.x, 0.001f, 0, 1);
+		ImGui::DragFloat("Color Split Difference", &chromAbbParams->colorSplitDiff, 0.001f, 0, 1);
 	}
 
 	ImGui::End();

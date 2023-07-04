@@ -153,6 +153,7 @@ void Game::LoadAssetsAndCreateEntities()
 	pixelShaders->insert({ "splitPS", LoadShader(SimplePixelShader, L"ForegroundBackgroundSplitPS.cso") });
 	pixelShaders->insert({ "blurPS", LoadShader(SimplePixelShader, L"BlurPS.cso") });
 	pixelShaders->insert({ "refracCompositePS", LoadShader(SimplePixelShader, L"RefractionCompositePS.cso") });
+	pixelShaders->insert({ "chromAbbPS", LoadShader(SimplePixelShader, L"ChromaticAberrationPS.cso") });
 
 	// Set up the sprite batch and load the sprite font
 	spriteBatch = std::make_shared<SpriteBatch>(context.Get());
@@ -721,6 +722,7 @@ void Game::Update(float deltaTime, float totalTime)
 		renderer->GetEntityGroups(), renderer->GetEmitters(),
 		renderer->GetRenderTypeCounts(),
 		srvs, renderer->GetFocusParams(),
+		renderer->GetChromAbbParams(),
 		sky->GetIrradianceMap());
 	//ImGui::ShowDemoWindow();
 

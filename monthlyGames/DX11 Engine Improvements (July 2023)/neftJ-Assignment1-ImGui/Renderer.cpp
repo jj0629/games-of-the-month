@@ -50,6 +50,12 @@ Renderer::Renderer(
 	focusParams.get()->focusCenter = DirectX::XMFLOAT2(0, 0);
 	focusParams.get()->focusIntensity = 10;
 
+	// Set chromatic aberration params
+	chromAbbParams = std::make_shared<ChromaticAberrationParams>();
+	chromAbbParams.get()->direction = DirectX::XMFLOAT2(0.003f, 0.002f);
+	chromAbbParams.get()->offset = DirectX::XMFLOAT2(0.002, 0.007f);
+	chromAbbParams.get()->colorSplitDiff = 0.006f;
+
 	ResortEntityVectors();
 
 	entityGroups.push_back(normalEntities);
@@ -309,8 +315,8 @@ void Renderer::Render(std::shared_ptr<Camera> camera, float deltaTime, float tot
 	splitPS->SetShaderResourceView("sceneDepths", renderTargetSRVs[RenderTargetType::SCENE_DEPTHS]);
 	context->Draw(3, 0);
 
-	// Save the REFRACTION_COMPOSITE mrt to the FINAL_COMPOSITE mrt.
-	targets[0] = renderTargetRTVs->GetAddressOf()[RenderTargetType::FINAL_COMPOSITE];
+	// Save the REFRACTION_COMPOSITE mrt to the BLUR_COMPOSITE mrt.
+	targets[0] = renderTargetRTVs->GetAddressOf()[RenderTargetType::BLUR_COMPOSITE];
 	context->OMSetRenderTargets(1, targets, 0);
 	std::shared_ptr<SimplePixelShader> simpleTexturePS = pixelShaders->at("simpleTexturePS");
 	simpleTexturePS->SetShader();
@@ -334,6 +340,20 @@ void Renderer::Render(std::shared_ptr<Camera> camera, float deltaTime, float tot
 	blurPS->CopyBufferData("externalData");
 	blurPS->SetShaderResourceView("texToBlur", renderTargetSRVs[RenderTargetType::REFRACTION_COMPOSITE]);
 	blurPS->SetShaderResourceView("blurMask", renderTargetSRVs[RenderTargetType::FOREGROUND_OBJECTS]);
+	context->Draw(3, 0);
+
+	// Next do our chromatic aberration pass on the whole screen
+	std::shared_ptr<SimplePixelShader> chromAbbPS = pixelShaders->at("chromAbbPS");
+	targets[0] = renderTargetRTVs->GetAddressOf()[RenderTargetType::FINAL_COMPOSITE];
+	context->OMSetRenderTargets(1, targets, 0);
+	chromAbbPS->SetShader();
+	
+	// Set chromatic aberration params
+	chromAbbPS->SetFloat2("direction", chromAbbParams.get()->direction);
+	chromAbbPS->SetFloat2("offset", chromAbbParams.get()->offset);
+	chromAbbPS->SetFloat("colorSplitDiff", chromAbbParams.get()->colorSplitDiff);
+	chromAbbPS->CopyBufferData("chromAbbData");
+	chromAbbPS->SetShaderResourceView("sceneColors", renderTargetSRVs[RenderTargetType::BLUR_COMPOSITE]);
 	context->Draw(3, 0);
 
 	// This block takes our final composite and puts it on the back buffer.
@@ -395,6 +415,11 @@ unsigned int Renderer::GetRenderTargetCount()
 std::shared_ptr<FocusParams> Renderer::GetFocusParams()
 {
 	return this->focusParams;
+}
+
+std::shared_ptr<ChromaticAberrationParams> Renderer::GetChromAbbParams()
+{
+	return this->chromAbbParams;
 }
 
 void Renderer::DrawPointLights(std::shared_ptr<Camera> camera)

@@ -24,6 +24,7 @@ enum RenderTargetType
 	REFRACTION_COMPOSITE,
 	FOREGROUND_OBJECTS,
 	BACKGROUND_OBJECTS,
+	BLUR_COMPOSITE,
 	FINAL_COMPOSITE,
 
 	// This is last so we know how many types of MRTs we have.
@@ -85,6 +86,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetRenderTargetSRV(int i);
 	unsigned int GetRenderTargetCount();
 	std::shared_ptr<FocusParams> GetFocusParams();
+	std::shared_ptr<ChromaticAberrationParams> GetChromAbbParams();
 	
 private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
@@ -125,6 +127,9 @@ private:
 
 	// Depth of Field stuffs
 	std::shared_ptr<FocusParams> focusParams;
+
+	// Chromatic Aberration Params
+	std::shared_ptr<ChromaticAberrationParams> chromAbbParams;
 
 	// Shader Dictionaries
 	std::unordered_map<std::string, std::shared_ptr<SimpleVertexShader>>* vertexShaders;

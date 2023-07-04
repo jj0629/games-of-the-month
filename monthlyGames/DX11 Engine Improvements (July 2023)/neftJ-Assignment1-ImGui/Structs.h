@@ -10,3 +10,10 @@ struct FocusParams
 	DirectX::XMFLOAT2 focusCenter;
 	float focusIntensity;
 };
+
+struct ChromaticAberrationParams
+{
+	DirectX::XMFLOAT2 direction;
+	DirectX::XMFLOAT2 offset;
+	float colorSplitDiff;
+};

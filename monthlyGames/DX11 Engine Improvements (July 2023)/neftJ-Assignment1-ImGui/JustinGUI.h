@@ -33,7 +33,7 @@ public:
 	void Update(float deltaTime, float totalTime, unsigned int width, unsigned int height,
 		std::vector<Light> lights, int* lightCount,
 		std::vector<std::vector<std::shared_ptr<GameEntity>>> eGroups, std::vector<std::shared_ptr<Emitter>> emits, std::vector<int*> renderTypeNums,
-		std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> srvs, std::shared_ptr<FocusParams> fp,
+		std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> srvs, std::shared_ptr<FocusParams> fp, std::shared_ptr<ChromaticAberrationParams> ca, 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> irradianceMapSRV);
 	void Draw();
 
@@ -46,6 +46,7 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> renderTargetSRVs;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> irradianceMapSRV;
 	std::shared_ptr<FocusParams> focusParams;
+	std::shared_ptr<ChromaticAberrationParams> chromAbbParams;
 	unsigned int width;
 	unsigned int height;
 
