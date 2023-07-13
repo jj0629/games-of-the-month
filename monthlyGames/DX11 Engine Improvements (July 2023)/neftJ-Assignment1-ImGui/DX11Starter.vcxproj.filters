@@ -238,7 +238,7 @@
     <FxCompile Include="ChromaticAberrationPS.hlsl">
       <Filter>Shaders\MRT Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="TestCS.hlsl">
+    <FxCompile Include="UpdateParticlesCS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
