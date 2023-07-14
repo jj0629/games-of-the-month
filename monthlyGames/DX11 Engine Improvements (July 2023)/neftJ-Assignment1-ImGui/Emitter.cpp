@@ -10,7 +10,8 @@ Emitter::Emitter(Microsoft::WRL::ComPtr<ID3D11Device> device,
 	DirectX::XMFLOAT3 spawnRange,
 	DirectX::XMFLOAT3 startVel,
 	DirectX::XMFLOAT3 velRange,
-	std::shared_ptr<Material> mat) :
+	std::shared_ptr<Material> mat,
+	std::shared_ptr<SimpleComputeShader> particleUpdateCS) :
 	device(device),
 	context(context),
 	particleAcceleration(accel),
@@ -29,14 +30,15 @@ Emitter::Emitter(Microsoft::WRL::ComPtr<ID3D11Device> device,
 	this->deadIndex = 0;
 	this->particles = new Particle[maxParticles];
 	this->material = mat;
+	this->updateParticleCS = particleUpdateCS;
 
 	transform = Transform();
 
 	// Create buffer and srv
 	D3D11_BUFFER_DESC desc = {};
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	desc.StructureByteStride = sizeof(Particle);
 	desc.ByteWidth = sizeof(Particle) * maxParticles;
@@ -48,6 +50,13 @@ Emitter::Emitter(Microsoft::WRL::ComPtr<ID3D11Device> device,
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = maxParticles;
 	device->CreateShaderResourceView(particleDataBuffer.Get(), &srvDesc, particleDataSRV.GetAddressOf());
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = maxParticles;
+	device->CreateUnorderedAccessView(particleDataBuffer.Get(), &uavDesc, particleDataUAV.GetAddressOf());
 
 	// Create indices
 	unsigned int* indices = new unsigned int[maxParticles * 6];
@@ -133,6 +142,15 @@ void Emitter::Update(float currentTime, float deltaTime)
 	}
 
 	CopyBufferToGPU();
+
+	// After copying, run the update compute shader to update particle positions and ages
+	updateParticleCS->SetShader();
+	updateParticleCS->SetFloat("currentTime", currentTime);
+	updateParticleCS->SetFloat3("acceleration", DirectX::XMFLOAT3(0, -3.0f, 0));
+	updateParticleCS->CopyBufferData("externalData");
+	updateParticleCS->SetUnorderedAccessView("ParticleData", particleDataUAV);
+
+	context->Dispatch(aliveParticleCount, 1, 1);
 }
 
 void Emitter::Draw(std::shared_ptr<Camera> camera, float currentTime)
@@ -152,8 +170,6 @@ void Emitter::Draw(std::shared_ptr<Camera> camera, float currentTime)
 	material->PrepareMaterial(&transform, camera);
 	
 	vs->SetShaderResourceView("ParticleData", particleDataSRV);
-	vs->SetFloat("currentTime", currentTime);
-	vs->SetFloat3("acceleration", DirectX::XMFLOAT3(0, -3.0f, 0));
 
 	// Finally make the draw call
 	context->DrawIndexed(aliveParticleCount * 6, 0, 0);
@@ -219,7 +235,7 @@ void Emitter::SetVelocityRange(DirectX::XMFLOAT3 velRange)
 void Emitter::CopyBufferToGPU()
 {
 	D3D11_MAPPED_SUBRESOURCE mapped = {};
-	context->Map(particleDataBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	context->Map(particleDataBuffer.Get(), 0, D3D11_MAP_READ_WRITE, 0, &mapped);
 	
 	if (livingIndex < deadIndex)
 	{

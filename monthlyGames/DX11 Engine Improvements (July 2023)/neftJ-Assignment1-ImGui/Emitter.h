@@ -15,6 +15,8 @@ struct Particle
 	float EmitTime;
 	DirectX::XMFLOAT3 StartPos;
 	DirectX::XMFLOAT3 StartVelocity;
+	DirectX::XMFLOAT3 CurrentPos;
+	float CurrentAge;
 	float Padding;
 };
 
@@ -30,7 +32,8 @@ public:
 		DirectX::XMFLOAT3 spawnRange,
 		DirectX::XMFLOAT3 startVel,
 		DirectX::XMFLOAT3 velRange,
-		std::shared_ptr<Material> mat);
+		std::shared_ptr<Material> mat,
+		std::shared_ptr<SimpleComputeShader> particleUpdateCS);
 	~Emitter();
 
 	void Update(float currentTime, float deltaTime);
@@ -72,6 +75,7 @@ private:
 	float particleMaxAge;
 	Transform transform;
 	std::shared_ptr<Material> material;
+	std::shared_ptr<SimpleComputeShader> updateParticleCS;
 	DirectX::XMFLOAT3 particleAcceleration;
 	DirectX::XMFLOAT3 particlePositionRange;
 	DirectX::XMFLOAT3 startVelocity;
@@ -80,6 +84,7 @@ private:
 	// Buffer Information
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleDataBuffer;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleDataSRV;
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particleDataUAV;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 
 	void CopyBufferToGPU();
