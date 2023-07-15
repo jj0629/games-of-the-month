@@ -145,12 +145,14 @@ void Emitter::Update(float currentTime, float deltaTime)
 
 	// After copying, run the update compute shader to update particle positions and ages
 	updateParticleCS->SetShader();
+	
 	updateParticleCS->SetFloat("currentTime", currentTime);
 	updateParticleCS->SetFloat3("acceleration", DirectX::XMFLOAT3(0, -3.0f, 0));
-	updateParticleCS->CopyBufferData("externalData");
+	updateParticleCS->CopyBufferData(0);
 	updateParticleCS->SetUnorderedAccessView("ParticleData", particleDataUAV);
+	updateParticleCS->DispatchByThreads(aliveParticleCount, 1, 1);
 
-	context->Dispatch(aliveParticleCount, 1, 1);
+	updateParticleCS->SetUnorderedAccessView("ParticleData", 0);
 }
 
 void Emitter::Draw(std::shared_ptr<Camera> camera, float currentTime)

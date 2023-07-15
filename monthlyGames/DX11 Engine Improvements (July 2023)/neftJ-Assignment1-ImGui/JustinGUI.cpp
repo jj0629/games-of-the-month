@@ -76,6 +76,16 @@ void JustinGUI::Draw()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
+std::vector<int*> JustinGUI::GetRenderTypeCounts()
+{
+	return renderTypeCounts;
+}
+
+int* JustinGUI::GetRenderCountByType(int type)
+{
+	return renderTypeCounts[type];
+}
+
 void JustinGUI::CreateBaseTree(unsigned int width, unsigned int height)
 {
 	ImGuiIO& io = ImGui::GetIO();

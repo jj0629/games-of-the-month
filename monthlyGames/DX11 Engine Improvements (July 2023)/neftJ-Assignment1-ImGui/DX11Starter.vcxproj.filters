@@ -239,7 +239,10 @@
       <Filter>Shaders\MRT Shaders</Filter>
     </FxCompile>
     <FxCompile Include="UpdateParticlesCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Particle Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="EmitParticleCS.hlsl">
+      <Filter>Shaders\Particle Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

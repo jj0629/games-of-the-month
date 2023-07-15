@@ -731,9 +731,10 @@ void Game::Update(float deltaTime, float totalTime)
 	camera->Update(deltaTime);
 
 	// Update Emitters
-	for (auto& e : emitters)
+	int* activeEmitterCount = justinGUI->GetRenderCountByType(RenderObjectType::EMITTER);
+	for (int i = 0; i < emitters.size(); i++)
 	{
-		e->Update(totalTime, deltaTime);
+		emitters[i]->Update(totalTime, deltaTime);
 	}
 
 	// Check individual input

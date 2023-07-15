@@ -36,6 +36,8 @@ public:
 		std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> srvs, std::shared_ptr<FocusParams> fp, std::shared_ptr<ChromaticAberrationParams> ca, 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> irradianceMapSRV);
 	void Draw();
+	std::vector<int*> GetRenderTypeCounts();
+	int* GetRenderCountByType(int type);
 
 private:
 	std::vector<Light> lights;

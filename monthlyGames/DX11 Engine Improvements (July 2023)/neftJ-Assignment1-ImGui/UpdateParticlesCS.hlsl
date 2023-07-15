@@ -10,7 +10,7 @@ struct Particle
     float Padding;
 };
 
-cbuffer externalData : register(b0)
+cbuffer data : register(b0)
 {
     float currentTime;
     float3 acceleration;
@@ -31,4 +31,5 @@ void main( uint3 DTid : SV_DispatchThreadID )
     // Move particle
     //float3 pos = p.StartPos + (age * p.Direction);
     p.CurrentPos = acceleration * p.CurrentAge * p.CurrentAge / 2.0f + p.StartVelocity * p.CurrentAge + p.StartPos;
+    ParticleData[DTid.x] = p;
 }
