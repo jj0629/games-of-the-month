@@ -595,7 +595,8 @@ void Game::CreateEmitters()
 	// First, load up shaders
 	vertexShaders->insert({ "particleVS", LoadShader(SimpleVertexShader, L"ParticleVS.cso") });
 	pixelShaders->insert({ "particlePS", LoadShader(SimplePixelShader, L"ParticlePS.cso") });
-	std::shared_ptr<SimpleComputeShader> particleUpdateCS = LoadShader(SimpleComputeShader, L"UpdateParticlesCS.cso");
+	std::shared_ptr<SimpleComputeShader> particleUpdateCS = LoadShader(SimpleComputeShader, L"UpdateParticleCS.cso");
+	std::shared_ptr<SimpleComputeShader> particleEmitCS = LoadShader(SimpleComputeShader, L"EmitParticleCS.cso");
 
 	std::shared_ptr<SimpleVertexShader> particleVS = vertexShaders->at("particleVS");
 	std::shared_ptr<SimplePixelShader> particlePS = pixelShaders->at("particlePS");
@@ -622,14 +623,14 @@ void Game::CreateEmitters()
 	sparkParticleMat->AddSampler("BasicSampler", samplerOptions);
 
 	// Create emitters
-	std::shared_ptr<Emitter> bubbleEmitter = std::make_shared<Emitter>(device, context, 100, 2, 25, XMFLOAT3(0, 3, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, 3), bubbleParticleMat, particleUpdateCS);
+	std::shared_ptr<Emitter> bubbleEmitter = std::make_shared<Emitter>(device, context, 100, 2, 25, XMFLOAT3(0, 3, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, 3), bubbleParticleMat, particleUpdateCS, particleEmitCS);
 	emitters.push_back(bubbleEmitter);
 
-	std::shared_ptr<Emitter> snowflakeEmitter = std::make_shared<Emitter>(device, context, 100, 5, 25, XMFLOAT3(0, -0.25f, 0), XMFLOAT3(10, 0, 10), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), snowflakeParticleMat, particleUpdateCS);
+	std::shared_ptr<Emitter> snowflakeEmitter = std::make_shared<Emitter>(device, context, 100, 5, 25, XMFLOAT3(0, -0.25f, 0), XMFLOAT3(10, 0, 10), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), snowflakeParticleMat, particleUpdateCS, particleEmitCS);
 	snowflakeEmitter->GetTransform()->SetPosition(DirectX::XMFLOAT3(5, 10, 0));
 	emitters.push_back(snowflakeEmitter);
 
-	std::shared_ptr<Emitter> sparkEmitter = std::make_shared<Emitter>(device, context, 100, 5, 5, XMFLOAT3(0, -0.25f, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, -2), XMFLOAT3(0, 0, 0), sparkParticleMat, particleUpdateCS);
+	std::shared_ptr<Emitter> sparkEmitter = std::make_shared<Emitter>(device, context, 100, 5, 5, XMFLOAT3(0, -0.25f, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, -2), XMFLOAT3(0, 0, 0), sparkParticleMat, particleUpdateCS, particleEmitCS);
 	sparkEmitter->GetTransform()->SetPosition(DirectX::XMFLOAT3(-5, 0, 0));
 	emitters.push_back(sparkEmitter);
 

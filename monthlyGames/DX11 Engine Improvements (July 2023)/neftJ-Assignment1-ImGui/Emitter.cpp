@@ -11,7 +11,8 @@ Emitter::Emitter(Microsoft::WRL::ComPtr<ID3D11Device> device,
 	DirectX::XMFLOAT3 startVel,
 	DirectX::XMFLOAT3 velRange,
 	std::shared_ptr<Material> mat,
-	std::shared_ptr<SimpleComputeShader> particleUpdateCS) :
+	std::shared_ptr<SimpleComputeShader> particleUpdateCS,
+	std::shared_ptr<SimpleComputeShader> particleEmitCS) :
 	device(device),
 	context(context),
 	particleAcceleration(accel),
@@ -31,6 +32,7 @@ Emitter::Emitter(Microsoft::WRL::ComPtr<ID3D11Device> device,
 	this->particles = new Particle[maxParticles];
 	this->material = mat;
 	this->updateParticleCS = particleUpdateCS;
+	this->emitParticleCS = particleEmitCS;
 
 	transform = Transform();
 
@@ -238,7 +240,11 @@ void Emitter::CopyBufferToGPU()
 {
 	D3D11_MAPPED_SUBRESOURCE mapped = {};
 	context->Map(particleDataBuffer.Get(), 0, D3D11_MAP_READ_WRITE, 0, &mapped);
+
+	// Create the entire buffer of max particles on the GPU.
+	memcpy(mapped.pData, particles + livingIndex, sizeof(Particle) * maxParticles);
 	
+	/*
 	if (livingIndex < deadIndex)
 	{
 		// Copy all particles from livingIndex to deadIndex
@@ -252,6 +258,7 @@ void Emitter::CopyBufferToGPU()
 		// Next, copy all the particles from livingIndex to the end of the array
 		memcpy((void*)((Particle*)mapped.pData + deadIndex), particles + livingIndex, sizeof(Particle) * (maxParticles - livingIndex));
 	}
+	*/
 
 	context->Unmap(particleDataBuffer.Get(), 0);
 }
@@ -262,6 +269,15 @@ void Emitter::EmitParticle(float currentTime)
 	{
 		return;
 	}
+	DirectX::XMFLOAT3 randPos = DirectX::XMFLOAT3();
+	randPos.x = particlePositionRange.x * RandomRange(-1, 1);
+	randPos.y = particlePositionRange.y * RandomRange(-1, 1);
+	randPos.z = particlePositionRange.z * RandomRange(-1, 1);
+
+	DirectX::XMFLOAT3 randVel = DirectX::XMFLOAT3();
+	randVel.x = velocityRange.x * RandomRange(-1, 1);
+	randVel.y = velocityRange.y * RandomRange(-1, 1);
+	randVel.z = velocityRange.z * RandomRange(-1, 1);
 
 	particles[deadIndex] = {};
 	particles[deadIndex].EmitTime = currentTime;
