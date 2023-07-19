@@ -83,6 +83,8 @@ Emitter::Emitter(Microsoft::WRL::ComPtr<ID3D11Device> device,
 	iDesc.ByteWidth = sizeof(unsigned int) * maxParticles * 6;
 	device->CreateBuffer(&iDesc, &iData, indexBuffer.GetAddressOf());
 	delete[] indices;
+
+	CopyBufferToGPU();
 }
 
 Emitter::~Emitter()
@@ -143,18 +145,37 @@ void Emitter::Update(float currentTime, float deltaTime)
 		timeSinceLastEmission -= secondsPerEmission;
 	}
 
-	CopyBufferToGPU();
-
 	// After copying, run the update compute shader to update particle positions and ages
 	updateParticleCS->SetShader();
 	
+	updateParticleCS->SetUnorderedAccessView("ParticleData", particleDataUAV);
 	updateParticleCS->SetFloat("currentTime", currentTime);
 	updateParticleCS->SetFloat3("acceleration", DirectX::XMFLOAT3(0, -3.0f, 0));
-	updateParticleCS->CopyBufferData(0);
-	updateParticleCS->SetUnorderedAccessView("ParticleData", particleDataUAV);
-	updateParticleCS->DispatchByThreads(aliveParticleCount, 1, 1);
+	if (livingIndex > deadIndex) {
+		updateParticleCS->SetInt("startIndex", livingIndex);
+		updateParticleCS->CopyBufferData(0);
+		if (livingIndex + aliveParticleCount >= maxParticles)
+		{
+			updateParticleCS->DispatchByThreads(aliveParticleCount - livingIndex, 1, 1);
+			int particlesAtBeginning = (livingIndex + aliveParticleCount) - maxParticles;
+			updateParticleCS->SetInt("startIndex", 0);
+			updateParticleCS->CopyBufferData(0);
+			updateParticleCS->DispatchByThreads(particlesAtBeginning, 1, 1);
+		}
+		else {
+			updateParticleCS->DispatchByThreads(aliveParticleCount, 1, 1);
+		}
+		
+		
+	}
+	else {
+		updateParticleCS->SetInt("startIndex", livingIndex);
+		updateParticleCS->CopyBufferData(0);
+		updateParticleCS->DispatchByThreads(aliveParticleCount, 1, 1);
+	}
+	
 
-	updateParticleCS->SetUnorderedAccessView("ParticleData", 0);
+	updateParticleCS->SetUnorderedAccessView("ParticleData", nullptr);
 }
 
 void Emitter::Draw(std::shared_ptr<Camera> camera, float currentTime)
@@ -177,6 +198,7 @@ void Emitter::Draw(std::shared_ptr<Camera> camera, float currentTime)
 
 	// Finally make the draw call
 	context->DrawIndexed(aliveParticleCount * 6, 0, 0);
+	vs->SetShaderResourceView("ParticleData", nullptr);
 }
 
 Transform* Emitter::GetTransform()
@@ -269,6 +291,7 @@ void Emitter::EmitParticle(float currentTime)
 	{
 		return;
 	}
+
 	DirectX::XMFLOAT3 randPos = DirectX::XMFLOAT3();
 	randPos.x = particlePositionRange.x * RandomRange(-1, 1);
 	randPos.y = particlePositionRange.y * RandomRange(-1, 1);
@@ -279,6 +302,33 @@ void Emitter::EmitParticle(float currentTime)
 	randVel.y = velocityRange.y * RandomRange(-1, 1);
 	randVel.z = velocityRange.z * RandomRange(-1, 1);
 
+	// Run a compute shader to emit a particle
+	emitParticleCS->SetShader();
+	emitParticleCS->SetFloat("currentTime", currentTime);
+	emitParticleCS->SetFloat3("startPos", this->transform.GetPosition());
+	emitParticleCS->SetFloat3("startVel", this->startVelocity);
+	emitParticleCS->SetFloat3("randPos", randPos);
+	emitParticleCS->SetFloat3("randVel", randVel);
+
+	if (livingIndex > deadIndex) {
+		emitParticleCS->SetInt("startIndex", livingIndex);
+	}
+	else {
+		emitParticleCS->SetInt("startIndex", deadIndex);
+	}
+
+	emitParticleCS->CopyBufferData(0);
+	emitParticleCS->SetUnorderedAccessView("ParticleData", particleDataUAV);
+	emitParticleCS->DispatchByThreads(1, 1, 1);
+
+	emitParticleCS->SetUnorderedAccessView("ParticleData", nullptr);
+
+	deadIndex++;
+	deadIndex %= maxParticles;
+	aliveParticleCount++;
+	
+
+	/*
 	particles[deadIndex] = {};
 	particles[deadIndex].EmitTime = currentTime;
 	
@@ -294,7 +344,6 @@ void Emitter::EmitParticle(float currentTime)
 	particles[deadIndex].StartVelocity.z += velocityRange.z * RandomRange(-1, 1);
 
 	// Increment emitter counters
-	deadIndex++;
-	deadIndex %= maxParticles;
-	aliveParticleCount++;
+	
+	*/
 }
