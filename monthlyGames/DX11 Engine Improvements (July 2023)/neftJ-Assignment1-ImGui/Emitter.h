@@ -20,6 +20,16 @@ struct Particle
 	float Padding;
 };
 
+struct EmitterData
+{
+	int LivingIndex;
+	int DeadIndex;
+	int AliveParticleCount;
+	int MaxParticles;
+	float MaxAge;
+	DirectX::XMFLOAT3 Padding;
+};
+
 class Emitter
 {
 public:
@@ -88,7 +98,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleDataSRV;
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particleDataUAV;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> emitterDataBuffer;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> emitterDataSRV;
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> emitterDataUAV;
 
+	void CreateBuffers();
 	void CopyBufferToGPU();
 	void EmitParticle(float currentTime);
 };

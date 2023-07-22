@@ -1,12 +1,4 @@
-struct Particle
-{
-    float EmitTime;
-    float3 StartPos;
-    float3 StartVelocity;
-    float3 CurrentPos;
-    float CurrentAge;
-    float Padding;
-};
+#include "Particles.hlsli"
 
 cbuffer data : register(b0)
 {
@@ -20,11 +12,16 @@ cbuffer data : register(b0)
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);
+RWStructuredBuffer<Emitter> EmitterData : register(u1);
 
 [numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    uint particleId = startIndex + DTid.x;
+    Emitter eData = EmitterData.Load(0);
+    if (eData.AliveParticleCount >= eData.MaxParticles)
+        return;
+    
+    uint particleId = (startIndex + DTid.x) % eData.MaxParticles;
     Particle p = ParticleData.Load(particleId);
     p.CurrentAge = 0;
 
@@ -42,5 +39,10 @@ void main( uint3 DTid : SV_DispatchThreadID )
     p.StartVelocity.y += randVel.y;
     p.StartVelocity.z += randVel.z;
     
+    eData.DeadIndex++;
+    eData.DeadIndex %= eData.MaxParticles;
+    eData.AliveParticleCount++;
+    
     ParticleData[particleId] = p;
+    EmitterData[0] = eData;
 }
