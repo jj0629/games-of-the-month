@@ -7,8 +7,7 @@ cbuffer data : register(b0)
     float3 startVel;
     float3 randPos;
     float3 randVel;
-    uint startIndex;
-    float2 padding;
+    float padding;
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);
@@ -21,7 +20,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     if (eData.AliveParticleCount >= eData.MaxParticles)
         return;
     
-    uint particleId = (startIndex + DTid.x) % eData.MaxParticles;
+    uint particleId = eData.DeadIndex + DTid.x;
     Particle p = ParticleData.Load(particleId);
     p.CurrentAge = 0;
 
@@ -39,10 +38,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
     p.StartVelocity.y += randVel.y;
     p.StartVelocity.z += randVel.z;
     
+    ParticleData[particleId] = p;
+    
     eData.DeadIndex++;
     eData.DeadIndex %= eData.MaxParticles;
     eData.AliveParticleCount++;
     
-    ParticleData[particleId] = p;
     EmitterData[0] = eData;
 }

@@ -62,7 +62,6 @@ void Emitter::Update(float currentTime, float deltaTime)
 	updateParticleCS->SetUnorderedAccessView("EmitterData", emitterDataUAV);
 	updateParticleCS->SetFloat("currentTime", currentTime);
 	updateParticleCS->SetFloat3("acceleration", DirectX::XMFLOAT3(0, -3.0f, 0));
-	updateParticleCS->SetInt("startIndex", livingIndex);
 	updateParticleCS->CopyBufferData(0);
 	updateParticleCS->DispatchByThreads(aliveParticleCount, 1, 1);
 
@@ -90,7 +89,7 @@ void Emitter::Draw(std::shared_ptr<Camera> camera, float currentTime)
 	vs->SetShaderResourceView("EmitterData", emitterDataSRV);
 
 	// Finally make the draw call
-	context->DrawIndexed(aliveParticleCount * 6, 0, 0);
+	context->DrawIndexed(maxParticles * 6, 0, 0);
 	vs->SetShaderResourceView("ParticleData", nullptr);
 	vs->SetShaderResourceView("EmitterData", nullptr);
 }
@@ -269,7 +268,6 @@ void Emitter::EmitParticle(float currentTime)
 	emitParticleCS->SetFloat3("startVel", this->startVelocity);
 	emitParticleCS->SetFloat3("randPos", randPos);
 	emitParticleCS->SetFloat3("randVel", randVel);
-	emitParticleCS->SetInt("startIndex", livingIndex);
 	emitParticleCS->CopyBufferData(0);
 	emitParticleCS->SetUnorderedAccessView("ParticleData", particleDataUAV);
 	emitParticleCS->SetUnorderedAccessView("EmitterData", emitterDataUAV);
