@@ -1,4 +1,14 @@
-#include "Particles.hlsli"
+#include "Lighting.hlsli"
+
+struct Particle
+{
+    float EmitTime;
+    float3 StartPos;
+    float3 StartVelocity;
+    float3 CurrentPos;
+    float CurrentAge;
+    float1 Padding;
+};
 
 struct VertexToPixel
 {
@@ -15,13 +25,12 @@ cbuffer externalData : register(b0)
 };
 
 StructuredBuffer<Particle> ParticleData : register(t0);
-StructuredBuffer<Emitter> EmitterData : register(t1);
 
 VertexToPixel main( uint id : SV_VertexID )
 {
     VertexToPixel output;
     
-    uint particleID = (id / 4);
+    uint particleID = id / 4;
     uint cornerID = id % 4;
     
     Particle p = ParticleData.Load(particleID);
