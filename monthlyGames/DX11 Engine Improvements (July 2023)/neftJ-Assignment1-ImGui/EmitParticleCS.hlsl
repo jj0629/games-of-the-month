@@ -11,12 +11,13 @@ struct Particle
 cbuffer data : register(b0)
 {
     float currentTime;
+    float3 acceleration;
     float3 startPos;
     float3 startVel;
     float3 randPos;
     float3 randVel;
     uint startIndex;
-    float2 padding;
+    float3 padding;
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);
@@ -26,7 +27,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
 {
     uint particleId = startIndex + DTid.x;
     Particle p = ParticleData.Load(particleId);
-    p.CurrentAge = 0;
 
     p.EmitTime = currentTime;
 	
@@ -35,7 +35,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
     p.StartPos.x += randPos.x;
     p.StartPos.y += randPos.y;
     p.StartPos.z += randPos.z;
-    p.CurrentPos = p.StartPos;
 
     p.StartVelocity = startVel;
     p.StartVelocity.x += randVel.x;
