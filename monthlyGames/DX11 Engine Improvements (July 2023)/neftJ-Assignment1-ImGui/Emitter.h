@@ -17,7 +17,7 @@ struct Particle
 	DirectX::XMFLOAT3 StartVelocity;
 	DirectX::XMFLOAT3 CurrentPos;
 	float CurrentAge;
-	bool IsActive;
+	float Padding;
 };
 
 struct EmitterData

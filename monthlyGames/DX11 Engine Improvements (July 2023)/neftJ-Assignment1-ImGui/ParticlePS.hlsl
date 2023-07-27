@@ -1,5 +1,11 @@
 #include "Particles.hlsli"
 
+struct VertexToPixel
+{
+    float4 position : SV_Position;
+    float2 uv : TEXCOORD;
+};
+
 cbuffer externalData : register(b0)
 {
     float3 colorTint;
@@ -11,11 +17,7 @@ cbuffer externalData : register(b0)
 Texture2D Texture : register(t0);
 SamplerState BasicSampler : register(s0);
 
-float4 main(ParticleVertexToPixel input) : SV_Target
+float4 main(VertexToPixel input) : SV_Target
 {
-    if (input.isActive == false)
-    {
-        discard;
-    }
     return Texture.Sample(BasicSampler, input.uv);
 }

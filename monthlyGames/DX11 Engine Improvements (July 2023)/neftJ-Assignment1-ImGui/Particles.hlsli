@@ -9,7 +9,7 @@ struct Particle
     float3 StartVelocity;
     float3 CurrentPos;
     float CurrentAge;
-    bool isActive;
+    float Padding;
 };
 
 struct Emitter
@@ -20,13 +20,6 @@ struct Emitter
     uint MaxParticles;
     float MaxAge;
     float3 Padding;
-};
-
-struct ParticleVertexToPixel
-{
-    float4 position : SV_Position;
-    float2 uv : TEXCOORD;
-    bool isActive : STATUS;
 };
 
 #endif
