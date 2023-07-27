@@ -20,9 +20,8 @@ StructuredBuffer<Emitter> EmitterData : register(t1);
 VertexToPixel main( uint id : SV_VertexID )
 {
     VertexToPixel output;
-    Emitter eData = EmitterData.Load(0);
     
-    uint particleID = eData.LivingIndex + (id / 4);
+    uint particleID = (id / 4);
     uint cornerID = id % 4;
     
     Particle p = ParticleData.Load(particleID);

@@ -4,6 +4,8 @@ cbuffer data : register(b0)
 {
     float currentTime;
     float3 acceleration;
+    uint startIndex;
+    float3 padding;
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);
@@ -13,7 +15,7 @@ RWStructuredBuffer<Emitter> EmitterData : register(u1);
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     Emitter eData = EmitterData.Load(0);
-    uint particleId = ((eData.LivingIndex + DTid.x) % eData.MaxParticles) % eData.MaxParticles;
+    uint particleId = (startIndex + DTid.x) % eData.MaxParticles;
     
     Particle p = ParticleData.Load(particleId);
    
@@ -23,8 +25,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
     // Move particle
     //float3 pos = p.StartPos + (age * p.Direction);
     p.CurrentPos = acceleration * p.CurrentAge * p.CurrentAge / 2.0f + p.StartVelocity * p.CurrentAge + p.StartPos;
-    
-    // Kill the particle by changing the index data once it's old enough
     if (p.CurrentAge >= eData.MaxAge)
     {
         eData.LivingIndex++;
