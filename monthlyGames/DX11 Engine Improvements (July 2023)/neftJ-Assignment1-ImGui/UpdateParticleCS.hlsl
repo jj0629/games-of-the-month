@@ -30,6 +30,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         eData.LivingIndex++;
         eData.LivingIndex = eData.LivingIndex % eData.MaxParticles;
         eData.AliveParticleCount--;
+        p.isActive = false;
     }
     EmitterData[0] = eData;
     ParticleData[particleId] = p;

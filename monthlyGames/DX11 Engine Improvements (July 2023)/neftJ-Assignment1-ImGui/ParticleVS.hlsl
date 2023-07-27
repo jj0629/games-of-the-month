@@ -1,11 +1,5 @@
 #include "Particles.hlsli"
 
-struct VertexToPixel
-{
-    float4 position : SV_Position;
-    float2 uv : TEXCOORD;
-};
-
 cbuffer externalData : register(b0)
 {
     matrix world;
@@ -17,12 +11,12 @@ cbuffer externalData : register(b0)
 StructuredBuffer<Particle> ParticleData : register(t0);
 StructuredBuffer<Emitter> EmitterData : register(t1);
 
-VertexToPixel main( uint id : SV_VertexID )
+ParticleVertexToPixel main( uint id : SV_VertexID )
 {
-    VertexToPixel output;
+    ParticleVertexToPixel output;
     Emitter eData = EmitterData.Load(0);
     
-    uint particleID = eData.LivingIndex + (id / 4);
+    uint particleID = id / 4;
     uint cornerID = id % 4;
     
     Particle p = ParticleData.Load(particleID);
@@ -48,6 +42,8 @@ VertexToPixel main( uint id : SV_VertexID )
     uvs[2] = float2(1, 1); // BR
     uvs[3] = float2(0, 1); // BL
     output.uv = uvs[cornerID];
+    
+    output.isActive = p.isActive;
     
 	return output;
 }

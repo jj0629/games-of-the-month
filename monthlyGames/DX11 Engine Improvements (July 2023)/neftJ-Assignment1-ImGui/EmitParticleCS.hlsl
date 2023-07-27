@@ -25,6 +25,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     p.CurrentAge = 0;
 
     p.EmitTime = currentTime;
+    p.isActive = true;
 	
 	// Decide particle spawning information
     p.StartPos = startPos;
