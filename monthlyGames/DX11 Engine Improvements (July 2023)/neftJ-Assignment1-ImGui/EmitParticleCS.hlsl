@@ -1,23 +1,13 @@
-struct Particle
-{
-    float EmitTime;
-    float3 StartPos;
-    float3 StartVelocity;
-    float3 CurrentPos;
-    float CurrentAge;
-    float Padding;
-};
+#include "Particles.hlsli"
 
 cbuffer data : register(b0)
 {
     float currentTime;
-    float3 acceleration;
     float3 startPos;
     float3 startVel;
     float3 randPos;
     float3 randVel;
     uint startIndex;
-    float3 padding;
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);

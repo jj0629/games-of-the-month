@@ -1,8 +1,4 @@
-struct VertexToPixel
-{
-    float4 position : SV_Position;
-    float2 uv : TEXCOORD;
-};
+#include "Particles.hlsli"
 
 cbuffer externalData : register(b0)
 {
@@ -15,7 +11,7 @@ cbuffer externalData : register(b0)
 Texture2D Texture : register(t0);
 SamplerState BasicSampler : register(s0);
 
-float4 main(VertexToPixel input) : SV_Target
+float4 main(ParticleVertexToPixel input) : SV_Target
 {
     return Texture.Sample(BasicSampler, input.uv);
 }

@@ -186,6 +186,7 @@
   <ItemGroup>
     <None Include="Lighting.hlsli" />
     <None Include="packages.config" />
+    <None Include="Particles.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">

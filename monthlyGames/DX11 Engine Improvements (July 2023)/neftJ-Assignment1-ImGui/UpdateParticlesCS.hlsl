@@ -1,19 +1,11 @@
-#include "Lighting.hlsli"
-
-struct Particle
-{
-    float EmitTime;
-    float3 StartPos;
-    float3 StartVelocity;
-    float3 CurrentPos;
-    float CurrentAge;
-    float Padding;
-};
+#include "Particles.hlsli"
 
 cbuffer data : register(b0)
 {
     float currentTime;
     float3 acceleration;
+    uint startIndex;
+    float3 padding;
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);
@@ -21,7 +13,7 @@ RWStructuredBuffer<Particle> ParticleData : register(u0);
 [numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    uint particleId = DTid.x;
+    uint particleId = (startIndex + DTid.x);
     
     Particle p = ParticleData.Load(particleId);
    
