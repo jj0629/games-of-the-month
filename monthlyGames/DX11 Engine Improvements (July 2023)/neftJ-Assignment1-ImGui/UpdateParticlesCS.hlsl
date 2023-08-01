@@ -4,8 +4,6 @@ cbuffer data : register(b0)
 {
     float currentTime;
     float3 acceleration;
-    uint startIndex;
-    float3 padding;
 };
 
 RWStructuredBuffer<Particle> ParticleData : register(u0);
@@ -13,7 +11,7 @@ RWStructuredBuffer<Particle> ParticleData : register(u0);
 [numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    uint particleId = (startIndex + DTid.x);
+    uint particleId = DTid.x;
     
     Particle p = ParticleData.Load(particleId);
    

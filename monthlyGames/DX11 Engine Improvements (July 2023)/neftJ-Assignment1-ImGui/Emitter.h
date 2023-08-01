@@ -33,8 +33,7 @@ public:
 		DirectX::XMFLOAT3 startVel,
 		DirectX::XMFLOAT3 velRange,
 		std::shared_ptr<Material> mat,
-		std::shared_ptr<SimpleComputeShader> particleUpdateCS,
-		std::shared_ptr<SimpleComputeShader> particleEmitCS);
+		std::shared_ptr<SimpleComputeShader> particleUpdateCS);
 	~Emitter();
 
 	void Update(float currentTime, float deltaTime);
@@ -77,7 +76,6 @@ private:
 	Transform transform;
 	std::shared_ptr<Material> material;
 	std::shared_ptr<SimpleComputeShader> updateParticleCS;
-	std::shared_ptr<SimpleComputeShader> emitParticleCS;
 	DirectX::XMFLOAT3 particleAcceleration;
 	DirectX::XMFLOAT3 particlePositionRange;
 	DirectX::XMFLOAT3 startVelocity;
